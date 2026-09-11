@@ -61,6 +61,8 @@ The app is a plain Node/Express server plus a SQLite file, so it deploys to any 
 
 Uses the upload path described above — visitors attach the relevant PDFs through the browser for each review. There's no local KSRT folder on the deployed host, so that dev-only fallback simply never triggers there.
 
+`render.yaml` sets `GEMINI_MODEL=gemini-2.5-flash` rather than the Pro-tier default — many Gemini API keys' free tier has zero quota for Pro-tier models, and Flash works reliably without needing billing enabled. If you've enabled billing on the Google Cloud project behind your key, you can change `GEMINI_MODEL` to `gemini-3.1-pro-preview` on the Render service for better reasoning quality, at higher cost and latency.
+
 ### Deploy to Render
 
 This repo includes a `render.yaml` Blueprint.
