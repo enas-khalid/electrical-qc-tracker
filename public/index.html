@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Electrical Submission QC Tracker</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-header__brand">
+    <img class="app-header__logo" src="assets/logo/ehaf-logo.jpg" alt="EHAF" />
+    <div>
+      <div class="app-header__title">Electrical Submission QC Tracker</div>
+      <div class="app-header__subtitle">EHAF Consulting Engineers · KSA</div>
+    </div>
+  </div>
+  <button class="btn btn--secondary" id="btn-new-submission" style="border-color:#fff;color:#fff">New submission</button>
+</header>
+
+<main class="app-main">
+
+  <!-- ===================== Dashboard view ===================== -->
+  <section id="view-dashboard">
+    <div class="page-title-row">
+      <div>
+        <div class="eyebrow">Dashboard</div>
+        <h1>Submissions</h1>
+      </div>
+    </div>
+
+    <div class="flex gap-3 mt-3" id="summary-metrics"></div>
+
+    <div class="card mt-4" style="overflow-x:auto">
+      <table class="data-table" id="submissions-table">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th>RIBA stage</th>
+            <th>Submission date</th>
+            <th>Checklist status</th>
+            <th class="align-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="submissions-tbody"></tbody>
+      </table>
+      <div class="empty-state" id="submissions-empty" hidden>
+        No submissions logged yet. Click <strong>New submission</strong> to add the first one.
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== Submission detail view ===================== -->
+  <section id="view-detail" hidden>
+    <div class="page-title-row">
+      <div>
+        <div class="eyebrow" id="detail-eyebrow">Submission</div>
+        <h1 id="detail-title">—</h1>
+        <div class="text-secondary mt-2" id="detail-subtitle"></div>
+      </div>
+      <div class="flex gap-2">
+        <button class="btn btn--text" id="btn-back">← Back to dashboard</button>
+        <button class="btn btn--danger" id="btn-delete-submission">Delete submission</button>
+      </div>
+    </div>
+
+    <div class="card card--padded">
+      <div class="eyebrow">Submission details</div>
+      <form id="form-detail-meta" class="form-grid mt-3">
+        <div class="field">
+          <label class="field__label" for="detail-project-name">Project name</label>
+          <input class="input" id="detail-project-name" required />
+        </div>
+        <div class="field">
+          <label class="field__label" for="detail-riba-stage">RIBA stage</label>
+          <select class="select" id="detail-riba-stage" required></select>
+        </div>
+        <div class="field">
+          <label class="field__label" for="detail-submission-date">Submission date</label>
+          <input class="input" type="date" id="detail-submission-date" required />
+        </div>
+        <div class="field field--full">
+          <label class="field__label" for="detail-notes">Notes</label>
+          <textarea class="textarea" id="detail-notes" placeholder="Optional notes about this submission"></textarea>
+        </div>
+      </form>
+      <div class="mt-3">
+        <button class="btn btn--primary btn--sm" id="btn-save-meta">Save details</button>
+        <span class="text-secondary" id="meta-save-status" style="font-size:12px;margin-left:10px"></span>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <div class="eyebrow">QC checklist</div>
+
+      <div class="card card--padded mt-2">
+        <div class="flex justify-between align-center" style="flex-wrap:wrap;gap:8px">
+          <div>
+            <div class="field__label" style="margin-bottom:2px">Documents for AI review</div>
+            <div class="field__hint">
+              Upload PDFs for this submission, or leave empty to use the local KSRT folder (local development only — not available on the deployed app).
+            </div>
+          </div>
+        </div>
+        <div class="form-grid mt-3">
+          <div class="field">
+            <label class="field__label" for="upload-calculation">Calculation file(s)</label>
+            <input class="input" type="file" id="upload-calculation" accept="application/pdf" multiple />
+          </div>
+          <div class="field">
+            <label class="field__label" for="upload-boq">Bill of Quantities</label>
+            <input class="input" type="file" id="upload-boq" accept="application/pdf" multiple />
+          </div>
+          <div class="field">
+            <label class="field__label" for="upload-specs">Specifications</label>
+            <input class="input" type="file" id="upload-specs" accept="application/pdf" multiple />
+          </div>
+          <div class="field">
+            <label class="field__label" for="upload-reference">Concept / reference report</label>
+            <input class="input" type="file" id="upload-reference" accept="application/pdf" multiple />
+          </div>
+        </div>
+        <div class="mt-3 flex align-center gap-3">
+          <button class="btn btn--secondary btn--sm" id="btn-run-ai-review">Run AI Review</button>
+          <span class="text-secondary" id="ai-review-status" style="font-size:12px"></span>
+        </div>
+      </div>
+
+      <div class="callout mt-3" id="ai-documents-panel" hidden></div>
+
+      <div class="checklist-list mt-3" id="checklist-list"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===================== New submission modal ===================== -->
+<div class="modal-overlay" id="modal-new" hidden>
+  <div class="modal">
+    <div class="modal__header">
+      <h3>New submission</h3>
+      <button class="modal__close" id="btn-close-modal" aria-label="Close">&times;</button>
+    </div>
+    <form id="form-new-submission">
+      <div class="modal__body">
+        <div class="callout" id="new-submission-errors" hidden></div>
+        <div class="form-grid mt-3">
+          <div class="field">
+            <label class="field__label" for="new-project-name">Project name</label>
+            <input class="input" id="new-project-name" value="KSRT" required />
+          </div>
+          <div class="field">
+            <label class="field__label" for="new-riba-stage">RIBA stage</label>
+            <select class="select" id="new-riba-stage" required></select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="new-submission-date">Submission date</label>
+            <input class="input" type="date" id="new-submission-date" required />
+          </div>
+          <div class="field field--full">
+            <label class="field__label" for="new-notes">Notes</label>
+            <textarea class="textarea" id="new-notes" placeholder="Optional notes about this submission"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button type="button" class="btn btn--text" id="btn-cancel-modal">Cancel</button>
+        <button type="submit" class="btn btn--primary">Create submission</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

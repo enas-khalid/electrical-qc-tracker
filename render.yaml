@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: electrical-qc-tracker
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.1-pro-preview
+      - key: DATA_DIR
+        value: /var/data
+    disk:
+      name: qc-tracker-data
+      mountPath: /var/data
+      sizeGB: 1
